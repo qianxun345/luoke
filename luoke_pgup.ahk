@@ -80,14 +80,14 @@ while (isRunning) {
     waitingForImage2 := true
     while (waitingForImage2 && isRunning) {
         ToolTip, Action: Searching for image2.png
-        ImageSearch, foundX2, foundY2, 1293, 10, 1376, 106, *50 image2.png
+        ImageSearch, foundX2, foundY2, 1418, 17, 1577, 180, *50 image2.png
         if (ErrorLevel = 0) {
             ToolTip, Action: Found image2.png - Proceeding
             waitingForImage2 := false ; 识别到了，跳出等待，进行后续操作
         } else {
             ; 没识别到，等待 3 - 5 秒（可被中断）
             ToolTip, Action: Waiting for image2.png...
-            if (!SafeSleep(3000, 50000))
+            if (!SafeSleep(3000, 5000))
                 break
         }
     }
