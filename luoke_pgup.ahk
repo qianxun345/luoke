@@ -8,6 +8,7 @@ PgUp::
 isRunning := !isRunning ; 按下 PgUp 切换开启/关闭状态
 
 if (isRunning) {
+    hasClickedClient := false ; 每次按 PgUp 启动时重置标记
     ToolTip, Script Started (Press PgUp to Stop)
     SetTimer, RemoveToolTip, -2000 ; 提示文字2秒后消失
 } else {
@@ -29,17 +30,20 @@ while (isRunning) {
     if (!SafeSleep(1300, 1500)) 
         break
 
-    ; 2. 鼠标点击client（115-125,386-390）
-    if (!isRunning) 
-        break
-    ToolTip, Action: Clicking Client (115-125`, 386-390)
-    Random, randX1, 115, 125
-    Random, randY1, 386, 390
-    X1 := randX1 + 9
-    Y1 := randY1 + 38
-    Click, %X1%, %Y1%
-    if (!SafeSleep(300, 500)) 
-        break
+    ; 2. 鼠标点击client（115-125,386-390） (仅执行一次)
+    if (!hasClickedClient) {
+        if (!isRunning) 
+            break
+        ToolTip, Action: Clicking Client (115-125`, 386-390)
+        Random, randX1, 115, 125
+        Random, randY1, 386, 390
+        X1 := randX1 + 9
+        Y1 := randY1 + 38
+        Click, %X1%, %Y1%
+        if (!SafeSleep(300, 500)) 
+            break
+        hasClickedClient := true ; 执行完成后将其打上标记，后续循环不再进入
+    }
 
     ; 3. 识别一张图片，名为image1.png，识别到之后点击，否则等待
     if (!isRunning) 
@@ -69,9 +73,10 @@ while (isRunning) {
             if (!SafeSleep(300, 500)) 
                 break
         } else {
-            ; 没识别到，等待 3 - 5 秒（可被中断）
-            ToolTip, Action: Waiting for image1.png...
-            if (!SafeSleep(3000, 5000))
+            ; 没识别到，执行鼠标滚轮向上滚动并等待（可被中断）
+            ToolTip, Action: Scrolling WheelUp & Waiting for image1.png...
+            Click, WheelUp
+            if (!SafeSleep(1000, 2000))
                 break
         }
     }
