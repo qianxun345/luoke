@@ -1,23 +1,19 @@
 #MaxThreadsPerHotkey 2
 global isRunning := false
-global targetPointX := -1
-global targetPointY := -1
 
 ; 绑定游戏窗口，只有在这个游戏里按 PgUp 才有效
 #IfWinActive ahk_exe NRC-Win64-Shipping.exe
 
-PgDn::
-CoordMode, Mouse, Client
-MouseGetPos, targetPointX, targetPointY
-ToolTip, Recorded Target Point: %targetPointX%`, %targetPointY%
-SetTimer, RemoveToolTip, -2000
-return
+; 获取窗口客户区大小的函数
+GetClientSize(ByRef w, ByRef h) {
+    WinGet, hwnd, ID, A
+    VarSetCapacity(rect, 16)
+    DllCall("GetClientRect", "ptr", hwnd, "ptr", &rect)
+    w := NumGet(rect, 8, "int")
+    h := NumGet(rect, 12, "int")
+}
 
 PgUp::
-if (targetPointX = -1) {
-    MsgBox, 请先按下 PgDn 记录传送点的位置！
-    return
-}
 isRunning := !isRunning ; 按下 PgUp 切换开启/关闭状态
 
 if (isRunning) {
@@ -32,6 +28,7 @@ if (isRunning) {
 
 ; 循环执行动作
 while (isRunning) {
+    GetClientSize(w, h)
     
     ; 1. 按m键
     if (!isRunning) 
@@ -43,39 +40,30 @@ while (isRunning) {
     if (!SafeSleep(1300, 1500)) 
         break
 
-    ; 2. 鼠标点击client（115-125,386-390） (仅执行一次)
-    if (!hasClickedClient) {
-        if (!isRunning) 
-            break
-        ToolTip, Action: Clicking Client (115-125`, 386-390)
-        Random, randX1, 115, 125
-        Random, randY1, 386, 390
-        X1 := randX1 + 9
-        Y1 := randY1 + 38
-        Click, %X1%, %Y1%
-        if (!SafeSleep(300, 500)) 
-            break
-        hasClickedClient := true ; 执行完成后将其打上标记，后续循环不再进入
-    }
-
-    ; 3. 直接点击 PgDn 记录的传送点，然后等待 10s 代替 image2
-    if (!isRunning) 
+; 3. 直接点击屏幕正中央，上下左右随机偏移5像素，然后等待 10s 代替 image2
+    if (!isRunning)
         break
     CoordMode, Mouse, Client
 
     ; 执行记录点的点击
-    ToolTip, Action: Clicking Recorded Point
-    Click, %targetPointX%, %targetPointY%
+    ToolTip, Action: Clicking Screen Center
+    Random, offsetX, -5, 5
+    Random, offsetY, -5, 5
+    targetX := Round(w / 2) + offsetX
+    targetY := Round(h / 2) + offsetY
+    Click, %targetX%, %targetY%
     if (!SafeSleep(300, 500)) 
         break
     
-    ; 然后点击右下角区域 client(1070-1478, 833-864)
+    ; 然后点击右下角区域 client(1070-1478, 833-864) 转换自1600x900
     if (!isRunning) 
         break
-    ToolTip, Action: Clicking Client (1070-1478`, 833-864)
-    Random, randX2, 1070, 1478
-    Random, randY2, 833, 864
-    Click, %randX2%, %randY2%
+    ToolTip, Action: Clicking Client (66.8`% to 92.3`%`, 92.5`% to 96`%)
+    Random, randPctX2, 0.66875, 0.92375
+    Random, randPctY2, 0.9255, 0.9600
+    X2 := Round(randPctX2 * w)
+    Y2 := Round(randPctY2 * h)
+    Click, %X2%, %Y2%
     if (!SafeSleep(300, 500)) 
         break
 
