@@ -151,19 +151,31 @@ while (isRunning) {
         if (!SafeSleep(450, 550)) 
             break
 
-        ; (4) R键
+        ; (4) R键 (反检测：概率性多按1~2次)
         ToolTip, Action: Pressing R Key
-        Send, {r down}
-        RandomSleep(80, 120)
-        Send, {r up}
+        Random, randR, 1, 100
+        rPresses := (randR <= 15) ? 2 : ((randR <= 20) ? 3 : 1) ; 15%按2次，5%按3次
+        Loop, %rPresses% {
+            Send, {r down}
+            RandomSleep(80, 120)
+            Send, {r up}
+            if (A_Index < rPresses)
+                RandomSleep(150, 300)
+        }
         if (!SafeSleep(9500, 10500)) 
             break
 
-        ; (5) X键
+        ; (5) X键 (反检测：概率性多按1~2次)
         ToolTip, Action: Pressing X Key
-        Send, {x down}
-        RandomSleep(80, 120)
-        Send, {x up}
+        Random, randX, 1, 100
+        xPresses := (randX <= 15) ? 2 : ((randX <= 20) ? 3 : 1) ; 15%按2次，5%按3次
+        Loop, %xPresses% {
+            Send, {x down}
+            RandomSleep(80, 120)
+            Send, {x up}
+            if (A_Index < xPresses)
+                RandomSleep(150, 300)
+        }
         if (!SafeSleep(40, 60)) 
             break
     }
