@@ -106,12 +106,26 @@ while (isRunning) {
     if (!SafeSleep(3800, 4200)) 
         break
 
-    ; 6. 执行luoke_pgdn.ahk中的1-5步，循环8-12次
+    ; 6. 执行鞠躬动作，循环8-12次
     Random, loopCount, 8, 12
     ToolTip, Action: Loop Action %loopCount% times
     Loop, %loopCount% {
         if (!isRunning) 
             break
+
+        ; --- 反检测：1. 模拟玩家发呆/看手机 (约 3% 概率延迟 10-20秒) ---
+        Random, afkChance, 1, 100
+        if (afkChance <= 3) {
+            ToolTip, Action: Simulating Human Distraction...
+            if (!SafeSleep(10000, 20000))
+                break
+        }
+        
+        ; --- 反检测：2. 独立的随机鼠标游离抖动 (约 8% 概率) ---
+        Random, jitterChance, 1, 100
+        if (jitterChance <= 8) {
+            RandomMouseJitter()
+        }
 
         ; (1) Tab键
         ToolTip, Action: Pressing Tab Key
@@ -153,8 +167,18 @@ while (isRunning) {
         if (!SafeSleep(40, 60)) 
             break
     }
-    if (!SafeSleep(800, 1200)) 
+    
+    ; --- 反检测：大循环结束后的随机喘息时间 (约 5% 概率停顿 5-10秒) ---
+    Random, restChance, 1, 100
+    if (restChance <= 5) {
+        ToolTip, Action: Taking a short break...
+        if (!SafeSleep(5000, 10000))
             break
+    } else {
+        ; 正常情况下的短停顿
+        if (!SafeSleep(800, 1200)) 
+            break
+    }
 }
 return
 
@@ -182,6 +206,19 @@ SafeSleep(minTime, maxTime) {
 RandomSleep(min, max) {
     Random, randTime, %min%, %max%
     Sleep, %randTime%
+}
+
+; ============================
+; 反检测：微小鼠标游荡/抖动
+; ============================
+; 模拟人手处于放松状态时不经意地触碰鼠标导致的光标滑动
+RandomMouseJitter() {
+    MouseGetPos, curX, curY
+    Random, jX, -20, 20
+    Random, jY, -20, 20
+    ; Speed参数 2~5 模仿较为自然的滑动速度
+    Random, speed, 2, 5
+    MouseMove, curX + jX, curY + jY, %speed%
 }
 
 ; 清理屏幕提示的子程序
