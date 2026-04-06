@@ -52,7 +52,7 @@ while (isRunning) {
     targetX := Round(w / 2) + offsetX
     targetY := Round(h / 2) + offsetY
     Click, %targetX%, %targetY%
-    if (!SafeSleep(300, 500)) 
+    if (!SafeSleep(500, 700)) 
         break
     
     ; 新增点击：双人模式中间点击区域 (1390-1719, 478-519 转换自1920x1080)
@@ -64,7 +64,7 @@ while (isRunning) {
     X_mid := Round(randPctX_mid * w)
     Y_mid := Round(randPctY_mid * h)
     Click, %X_mid%, %Y_mid%
-    if (!SafeSleep(300, 500)) 
+    if (!SafeSleep(500, 700)) 
         break
 
     ; 然后点击右下角区域 client(1070-1478, 833-864) 转换自1600x900
@@ -76,8 +76,6 @@ while (isRunning) {
     X2 := Round(randPctX2 * w)
     Y2 := Round(randPctY2 * h)
     Click, %X2%, %Y2%
-    if (!SafeSleep(300, 500)) 
-        break
 
     ; 4. 不再识别 image2，直接等待 10s 后开始后续操作
     ToolTip, Action: Waiting for 10s...
