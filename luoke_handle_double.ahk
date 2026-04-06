@@ -64,7 +64,7 @@ while (isRunning) {
     X_mid := Round(randPctX_mid * w)
     Y_mid := Round(randPctY_mid * h)
     Click, %X_mid%, %Y_mid%
-    if (!SafeSleep(500, 700)) 
+    if (!SafeSleep(800, 1200)) 
         break
 
     ; 然后点击右下角区域 client(1070-1478, 833-864) 转换自1600x900
