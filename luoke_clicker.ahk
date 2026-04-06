@@ -22,8 +22,11 @@ while (isRunning) {
     if (!isRunning) 
         break
     
-    ; 模拟鼠标左键点击
-    Click
+    ; 模拟鼠标左键点击，增加按下时间防止漏检
+    Click, Down
+    Random, randSleep, 30, 60
+    Sleep, %randSleep% ; 增加按键随机停留 30 - 60ms
+    Click, Up
 
     ; 等待 0.8 - 1.2 秒 (800ms - 1200ms)
     ; SafeSleep 会分割睡眠时间，以便在等待期间按下PgDn能迅速中断
